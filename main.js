@@ -22,7 +22,7 @@ const glados = async () => {
       const action = await fetch('https://glados.cloud/api/user/checkin', {
         method: 'POST',
         headers: { ...common, 'content-type': 'application/json' },
-        body: '{"token":"glados.one"}',
+        body: JSON.stringify({ token: "glados.cloud" }),
       }).then((r) => r.json())
         console.log('CHECKIN RESPONSE:', JSON.stringify(action))
           if (action?.code && action?.code !== 0) {
