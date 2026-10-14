@@ -10,17 +10,22 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
       - run: npm ci
       - run: npm run main
         env:
           GLADOS: ${{ secrets.GLADOS }}
+          GLADOS_UA: ${{ secrets.GLADOS_UA }}
+          DOMAIN: ${{ secrets.DOMAIN }}
           NOTIFY: ${{ secrets.NOTIFY }}
+          # 积分自动兑换开关：true=满阈值自动兑换天数，false=关闭
+          AUTO_EXCHANGE: ${{ vars.AUTO_EXCHANGE || 'false' }}
+          EXCHANGE_THRESHOLD: ${{ vars.EXCHANGE_THRESHOLD || '500' }}
 
-  # ===== 以下为新增 job：防止 GitHub 因「仓库 60 天无新提交」自动禁用定时任务 =====
+  # ===== 防止 GitHub 因「公开仓库 60 天无活动」自动停用定时任务 =====
   keepalive:
     needs: run
     if: always()
@@ -28,7 +33,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: 保活心跳
         run: |
           if [ -z "$(git log --since='45 days ago' --oneline)" ]; then
